@@ -15,8 +15,6 @@ __pycache__/
 reports/eda/.mplconfig/
 .mplconfig/
 *.json
-*.html
-!README.md
 
 # All CSV files
 *.csv

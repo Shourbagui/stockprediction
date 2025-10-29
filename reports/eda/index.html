@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>EDA Dashboard</title>
+    <style>
+      :root {
+        --bg: #0f172a;
+        --panel: #111827;
+        --card: #0b1220;
+        --text: #e5e7eb;
+        --muted: #94a3b8;
+        --accent: #22d3ee;
+        --accent-2: #a78bfa;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+        background: radial-gradient(1200px 800px at 0% 0%, #0b1220 0, var(--bg) 50%), var(--bg);
+        color: var(--text);
+      }
+      header { position: sticky; top: 0; backdrop-filter: saturate(140%) blur(6px); background: rgba(17,24,39,.6); border-bottom: 1px solid rgba(148,163,184,.15); z-index: 10; }
+      .wrap { max-width: 1200px; margin: 0 auto; padding: 16px 20px; }
+      .title { display: flex; align-items: center; gap: 14px; }
+      .badge { padding: 2px 10px; border-radius: 999px; border: 1px solid rgba(148,163,184,.25); color: var(--muted); font-size: 12px; }
+      .grid { display: grid; gap: 16px; grid-template-columns: repeat(12, 1fr); }
+      .card { background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01)); border: 1px solid rgba(148,163,184,.15); border-radius: 14px; padding: 18px 20px; }
+      .card h3 { margin: 0 0 10px; font-size: 16px; color: #f3f4f6; }
+      .muted { color: var(--muted); font-size: 13px; }
+      .kpi { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+      .kpi .metric { background: var(--card); border: 1px solid rgba(148,163,184,.12); border-radius: 12px; padding: 14px; }
+      .metric .label { color: var(--muted); font-size: 12px; }
+      .metric .value { font-size: 22px; margin-top: 6px; }
+      .two { grid-column: span 6; }
+      .full { grid-column: span 12; }
+      img { display: block; width: 100%; height: auto; border-radius: 10px; border: 1px solid rgba(148,163,184,.12); }
+      a.btn { display: inline-block; padding: 10px 14px; border-radius: 10px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); color: #0b1220; font-weight: 600; text-decoration: none; border: none; }
+      .row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+      .tall img { width: 100%; height: auto; }
+      .fit { display: grid; gap: 20px; }
+      .footer { color: var(--muted); font-size: 12px; text-align: center; padding: 24px 0 40px; }
+      @media (max-width: 960px) {
+        .two { grid-column: span 12; }
+        .kpi { grid-template-columns: repeat(2, 1fr); }
+        .row { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wrap title">
+        <div style="width:10px;height:10px;border-radius:50%;background:linear-gradient(90deg,var(--accent),var(--accent-2));box-shadow:0 0 16px rgba(34,211,238,.6);"></div>
+        <h2 style="margin:0;font-weight:700">EDA Dashboard</h2>
+        <span class="badge">Last 10 years • 6 tickers</span>
+      </div>
+    </header>
+
+    <main class="wrap" style="padding-top:20px">
+      <section class="grid">
+        <div class="card full">
+          <div class="kpi">
+            <div class="metric"><div class="label">Rows</div><div class="value" id="kpi-rows">—</div></div>
+            <div class="metric"><div class="label">Columns</div><div class="value" id="kpi-cols">—</div></div>
+            <div class="metric"><div class="label">Date Range</div><div class="value" id="kpi-range">—</div></div>
+            <div class="metric"><div class="label">Tickers</div><div class="value" id="kpi-tickers">—</div></div>
+          </div>
+          <p class="muted" style="margin-top:10px">This summary reflects the cleaned slice used for EDA (recent 10 years).</p>
+        </div>
+
+        <div class="card full">
+          <h3>Price change — last 10 years (all tickers)</h3>
+          <img src="price_lines_last10y.png" alt="Price change last 10 years">
+          <p class="muted" style="margin-top:10px">Close prices normalized to 100 at the start of the period. Shows relative performance across tickers.</p>
+        </div>
+
+        <div class="card two">
+          <h3>Class distribution — label_5d</h3>
+          <img src="class_distribution_label_5d.png" alt="Class distribution label_5d">
+        </div>
+        <div class="card two">
+          <h3>Class distribution — label_20d</h3>
+          <img src="class_distribution_label_20d.png" alt="Class distribution label_20d">
+        </div>
+        <div class="card two">
+          <h3>Class distribution (pie) — label_5d</h3>
+          <img src="class_distribution_label_5d_pie.png" alt="Class distribution label_5d pie">
+        </div>
+        <div class="card two">
+          <h3>Class distribution (pie) — label_20d</h3>
+          <img src="class_distribution_label_20d_pie.png" alt="Class distribution label_20d pie">
+        </div>
+
+        <div class="card two">
+          <h3>Missingness (sampled)</h3>
+          <img src="missingness_heatmap_sample.png" alt="Missingness heatmap">
+          <p class="muted" style="margin-top:10px">Fundamentals and sentiment fields show high missingness in recent years; technical and price fields are dense.</p>
+        </div>
+        <div class="card two">
+          <h3>Per-ticker label mix (label_5d)</h3>
+          <img src="label5_by_ticker_stacked.png" alt="Label by ticker stacked">
+          <p class="muted" style="margin-top:10px">Stacked bars show proportions of Buy/Hold/Sell per ticker.</p>
+        </div>
+        <div class="card two">
+          <h3>Correlation heatmap</h3>
+          <img src="correlation_heatmap.png" alt="Correlation heatmap">
+          <p class="muted" style="margin-top:10px">Strong coherence among moving averages; returns correlate with momentum/RSI features.</p>
+        </div>
+        <div class="card two">
+          <h3>Label 5d vs 20d</h3>
+          <img src="label5_vs_label20_heatmap.png" alt="Label 5d vs 20d heatmap">
+          <p class="muted" style="margin-top:10px">Co-occurrence heatmap: how often each pair of labels happens together.</p>
+        </div>
+
+        <div class="card full">
+          <h3>Key distributions — Boxplots</h3>
+          <img src="boxplots_key_features.png" alt="Boxplots key features">
+        </div>
+        <div class="card full">
+          <h3>Key distributions — Histograms</h3>
+          <img src="histograms_1.png" alt="Histograms batch 1" onerror="this.style.display='none'">
+        </div>
+
+
+        <div class="card full">
+          <h3>Rolling class distribution (monthly)</h3>
+          <img src="rolling_class_distribution_label5_monthly.png" alt="Rolling class distribution label_5d">
+          <p class="muted" style="margin-top:10px">Monthly Buy/Hold/Sell proportions highlight regime shifts and class imbalance changes over time.</p>
+        </div>
+
+        <div class="card two">
+          <h3>Label transition matrix</h3>
+          <img src="label5_transition_matrix.png" alt="Label transition matrix">
+          <p class="muted" style="margin-top:10px">Consecutive-day transitions for label_5d. High diagonal = persistence; off-diagonal = flips.</p>
+        </div>
+        <div class="card two">
+          <h3>Mutual information (top features)</h3>
+          <img src="mi_topk_label5.png" alt="Mutual information top-k">
+          <p class="muted" style="margin-top:10px">Nonlinear, model-agnostic importance of features vs. label_5d. See CSV for full ranking.</p>
+        </div>
+
+        <div class="card full">
+          <h3>PCA explained variance</h3>
+          <img src="pca_variance.png" alt="PCA explained variance">
+          <p class="muted" style="margin-top:10px">Variance captured by the first PCs. Useful for dimensionality reduction decisions.</p>
+        </div>
+
+        <div class="card full">
+          <h3>Leakage audit across lags</h3>
+          <img src="leakage_audit_heatmap.png" alt="Leakage audit heatmap">
+          <p class="muted" style="margin-top:10px">Correlation of feature(t+lag) with fwd_ret_5d across lags −10…+10. Positive lags with high |corr| may indicate look‑ahead leakage risk.</p>
+        </div>
+
+        <div class="card full">
+          <h3>ACF/PACF and rolling volatility (per ticker)</h3>
+          <div class="row">
+            <img src="acf_pacf_AAPL.png" alt="ACF PACF AAPL" onerror="this.style.display='none'">
+            <img src="rolling_vol_AAPL.png" alt="Rolling vol AAPL" onerror="this.style.display='none'">
+          </div>
+          <div class="row">
+            <img src="acf_pacf_MSFT.png" alt="ACF PACF MSFT" onerror="this.style.display='none'">
+            <img src="rolling_vol_MSFT.png" alt="Rolling vol MSFT" onerror="this.style.display='none'">
+          </div>
+          <div class="row">
+            <img src="acf_pacf_TSLA.png" alt="ACF PACF TSLA" onerror="this.style.display='none'">
+            <img src="rolling_vol_TSLA.png" alt="Rolling vol TSLA" onerror="this.style.display='none'">
+          </div>
+          <p class="muted" style="margin-top:10px">Autocorrelation (ACF) and partial autocorrelation (PACF) of daily returns, plus 20‑day rolling volatility, provide time‑series structure diagnostics. Additional tickers available as files in this folder.</p>
+        </div>
+
+        
+        <div class="card full">
+          <h3>By‑label distributions — Boxplots</h3>
+          <img src="boxplots_by_label5.png" alt="Boxplots by label">
+        </div>
+        <div class="card full">
+          <h3>By‑label distributions — Violin plots</h3>
+          <img src="violins_by_label5.png" alt="Violins by label">
+        </div>
+
+        <div class="card two">
+          <h3>Per‑ticker coverage</h3>
+          <iframe src="ticker_coverage.csv" style="width:100%;height:240px;background:#0a0f1a;border:1px solid rgba(148,163,184,.15);border-radius:10px"></iframe>
+          <p class="muted" style="margin-top:10px">All 6 tickers have consistent coverage across the chosen period.</p>
+        </div>
+        <div class="card two" style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <div>
+            <h3 style="margin-bottom:6px">Full interactive profile</h3>
+            <p class="muted" style="margin:0 0 10px">Open the complete ydata profile for detailed variable stats and alerts.</p>
+            <a class="btn" href="ydata_profile.html" target="_blank" rel="noreferrer">Open full report</a>
+          </div>
+          <img src="histograms_2.png" alt="Histograms batch 2" style="max-width:48%" onerror="this.style.display='none'">
+        </div>
+      </section>
+
+      <section class="footer">
+        Generated locally • Links to CSVs and PNGs in this folder.
+      </section>
+    </main>
+
+    <script>
+      async function loadCSV(path){
+        const res = await fetch(path);
+        if(!res.ok) return null;
+        const text = await res.text();
+        return text.trim().split(/\r?\n/).map(l=>l.split(","));
+      }
+      (async()=>{
+        const el = (id, v)=>{ const n = document.getElementById(id); if(n) n.textContent = v; };
+        try {
+          const overview = await loadCSV('overview.csv');
+          if(overview){
+            const map = Object.fromEntries(overview.slice(1).map(([k,v])=>[k,v]));
+            el('kpi-rows', map['num_rows'] || '—');
+            el('kpi-cols', map['num_columns'] || '—');
+            const range = `${(map['date_min']||'').slice(0,10)} → ${(map['date_max']||'').slice(0,10)}`;
+            el('kpi-range', range.includes('→') ? range : '—');
+            el('kpi-tickers', map['num_tickers'] || '—');
+          }
+
+        } catch (e) {
+          // If running via file://, fetch may be blocked. Show hint.
+          const hint = document.createElement('div');
+          hint.className = 'muted';
+          hint.style.marginTop = '10px';
+          hint.textContent = 'Tip: if KPIs are blank, open this page via http://localhost (python -m http.server) so CSV loading works.';
+          document.querySelector('.wrap').prepend(hint);
+        }
+      })();
+    </script>
+  </body>
+  </html>
+
+
