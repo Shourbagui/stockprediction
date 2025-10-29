@@ -3,40 +3,60 @@
 ## Overview
 A machine learning pipeline for stock market classification (Buy/Hold/Sell) using historical price data, technical indicators, and sentiment features.
 
-## Setup
+## Quick Start
 
-### 1. Create and activate virtual environment
+After cloning the repository, follow these steps:
+
+### 1. Clone and navigate
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
+git clone https://github.com/Shourbagui/stockprediction.git
+cd stockprediction
 ```
 
-### 2. Install dependencies
+### 2. Create and activate virtual environment
+```bash
+python3 -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+```
+
+### 3. Install dependencies
+```bash
+pip install -r requirements.txt
+```
+
+Or install individually if preferred:
 ```bash
 pip install pandas numpy matplotlib seaborn scikit-learn statsmodels ydata-profiling pyarrow fastparquet
 ```
 
-### 3. Data
-- Place your `panel_daily.csv` in the root directory
-- Expected columns: `date`, `ticker`, price data (Open, High, Low, Close), technical indicators, fundamentals, sentiment features
-- Labels: `label_5d`, `label_20d` (Buy/Hold/Sell)
+### 4. Prepare your data
+Place your `panel_daily.csv` file in the root directory. The CSV should contain:
+- **Required columns**: `date`, `ticker`
+- **Price data**: Open, High, Low, Close, Volume
+- **Technical indicators**: Moving averages, RSI, momentum indicators, etc.
+- **Labels**: `label_5d`, `label_20d` (values: "Buy", "Hold", "Sell")
 
-### 4. Run EDA
+### 5. Run the EDA pipeline
 ```bash
 python eda/eda.py
 ```
 
-This generates:
+This will generate:
 - `reports/eda/index.html` - Modern interactive dashboard
-- `reports/eda/ydata_profile.html` - Full data profile
-- CSV summaries of distributions, correlations, feature importance
+- `reports/eda/ydata_profile.html` - Comprehensive data profile
+- CSV summaries and PNG visualizations in `reports/eda/`
 
-### 5. View Dashboard
+### 6. View the Dashboard
 ```bash
-cd /Users/alyshourbagui/bigdata
+# From the project root directory
 python3 -m http.server 8000
-# Visit: http://localhost:8000/reports/eda/index.html
 ```
+
+Then open your browser and visit:
+- **Main Dashboard**: http://localhost:8000/reports/eda/index.html
+- **Full Profile**: http://localhost:8000/reports/eda/ydata_profile.html
+
+**Note**: You can use any available port (8001, 8002, etc.) if 8000 is already in use.
 
 ## Project Structure
 ```
