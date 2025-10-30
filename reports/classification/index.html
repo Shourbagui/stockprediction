@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Classification Model Results</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #e2e8f0;
+      line-height: 1.6;
+    }
+
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 50px;
+      padding-bottom: 30px;
+      border-bottom: 2px solid rgba(148, 163, 184, 0.2);
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      color: #94a3b8;
+      font-size: 1.1rem;
+    }
+
+    .kpi-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 50px;
+    }
+
+    .kpi {
+      background: rgba(30, 41, 59, 0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-radius: 12px;
+      padding: 25px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .kpi:hover {
+      background: rgba(30, 41, 59, 1);
+      border-color: rgba(148, 163, 184, 0.3);
+      transform: translateY(-5px);
+    }
+
+    .kpi-label {
+      color: #94a3b8;
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .kpi-value {
+      font-size: 2.5rem;
+      font-weight: bold;
+      background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .section {
+      margin-bottom: 50px;
+    }
+
+    .card {
+      background: rgba(30, 41, 59, 0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-radius: 12px;
+      padding: 30px;
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      background: rgba(30, 41, 59, 1);
+      border-color: rgba(148, 163, 184, 0.3);
+    }
+
+    .card h2 {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      color: #e2e8f0;
+    }
+
+    .card img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin-top: 15px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+      gap: 30px;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      margin-top: 15px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+    }
+
+    th {
+      background: rgba(148, 163, 184, 0.1);
+      font-weight: 600;
+      color: #cbd5e1;
+    }
+
+    tr:hover {
+      background: rgba(148, 163, 184, 0.05);
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 30px;
+      padding: 10px 20px;
+      background: rgba(59, 130, 246, 0.2);
+      border: 1px solid rgba(59, 130, 246, 0.5);
+      border-radius: 8px;
+      color: #60a5fa;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .back-link:hover {
+      background: rgba(59, 130, 246, 0.3);
+      border-color: rgba(59, 130, 246, 1);
+    }
+
+    .footer {
+      text-align: center;
+      padding-top: 30px;
+      border-top: 1px solid rgba(148, 163, 184, 0.15);
+      color: #64748b;
+      font-size: 0.9rem;
+    }
+
+    .muted {
+      color: #94a3b8;
+      font-size: 0.95rem;
+      margin-top: 15px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <a href="../eda/index.html" class="back-link">← Back to EDA Dashboard</a>
+
+    <header>
+      <h1>🤖 Classification Model Results</h1>
+      <p class="subtitle">Gradient Boosting Machine Learning for Buy/Hold/Sell Prediction</p>
+    </header>
+
+    <!-- KPIs -->
+    <div class="kpi-section">
+      <div class="kpi">
+        <div class="kpi-label">Test Accuracy</div>
+        <div class="kpi-value" id="kpi-accuracy">—</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Training Set Size</div>
+        <div class="kpi-value" id="kpi-train">—</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Test Set Size</div>
+        <div class="kpi-value" id="kpi-test">—</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Number of Features</div>
+        <div class="kpi-value" id="kpi-features">—</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Classes</div>
+        <div class="kpi-value" id="kpi-classes">—</div>
+      </div>
+    </div>
+
+    <!-- Classification Report -->
+    <div class="section">
+      <div class="card">
+        <h2>📋 Classification Report</h2>
+        <div id="classification-report">
+          <div class="muted">Loading classification report...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confusion Matrix -->
+    <div class="section">
+      <div class="card">
+        <h2>📊 Confusion Matrix</h2>
+        <img src="/classification/confusion_matrix.png" alt="Confusion matrix">
+        <p class="muted">Actual vs predicted classes. Diagonal shows correct predictions. Off-diagonal shows misclassifications between Buy/Hold/Sell.</p>
+      </div>
+    </div>
+
+    <!-- Preprocessing -->
+    <div class="section">
+      <div class="card">
+        <h2>🔧 Data Preprocessing</h2>
+        <div class="muted" style="margin-top: 0;">
+          <strong>Feature Engineering:</strong><br>
+          • <strong>Temporal Features:</strong> Extracted year, month, day_of_week, quarter, day_of_year from timestamps<br>
+          • <strong>Lagged Features:</strong> Created 1, 5, 10, 20-day lags for Close, Volume, ret_1d, rsi14<br>
+          • <strong>Rolling Statistics:</strong> 5, 10, 20-day rolling means and standard deviations<br>
+          • <strong>Momentum Indicators:</strong> 5 & 20-day price momentum calculations<br>
+          • <strong>Volume Analysis:</strong> Volume ratios vs rolling averages<br>
+          • <strong>Volatility Regimes:</strong> Categorical volatility classifications<br><br>
+          
+          <strong>Data Cleaning:</strong><br>
+          • Replaced infinite values with NaN<br>
+          • Imputed missing values using median for numeric columns<br>
+          • Encoded categorical variables (ticker, volatility regime)<br>
+          • Applied RobustScaler to handle outliers in feature distributions<br><br>
+          
+          <strong>Train/Test Split:</strong> Time-aware split (80/20) preserving temporal order
+        </div>
+      </div>
+    </div>
+
+    <!-- Model Architecture -->
+    <div class="section">
+      <div class="card">
+        <h2>🧠 Model Architecture</h2>
+        <div class="muted" style="margin-top: 0;">
+          <strong>HistGradientBoostingClassifier</strong><br><br>
+          A fast, highly optimized gradient boosting implementation from Scikit-learn that:
+          • Handles missing values natively (no prior imputation required)<br>
+          • Uses histogram-based learning for efficiency<br>
+          • Implements early stopping to prevent overfitting<br>
+          • Supports class weighting for imbalanced datasets<br><br>
+          
+          <strong>Configuration:</strong><br>
+          • <strong>Iterations:</strong> 500 max with early stopping (patience: 50)<br>
+          • <strong>Learning Rate:</strong> 0.05<br>
+          • <strong>Max Depth:</strong> 8<br>
+          • <strong>Min Samples per Leaf:</strong> 100<br>
+          • <strong>L2 Regularization:</strong> 0.1<br>
+          • <strong>Class Weights:</strong> Balanced (Buy: 1.37, Hold: 0.54, Sell: 2.37)<br><br>
+          
+          <strong>Why This Model:</strong> Gradient boosting excels at capturing complex non-linear relationships in tabular time-series data, making it ideal for financial prediction tasks. The histogram-based approach provides speed and scalability while maintaining accuracy.
+        </div>
+      </div>
+    </div>
+
+    <!-- Data Summary -->
+    <div class="section">
+      <div class="card">
+        <h2>📊 Dataset Summary</h2>
+        <table>
+          <tr>
+            <th>Metric</th>
+            <th>Value</th>
+          </tr>
+          <tr>
+            <td>Training Set Size</td>
+            <td id="summary-train">—</td>
+          </tr>
+          <tr>
+            <td>Test Set Size</td>
+            <td id="summary-test">—</td>
+          </tr>
+          <tr>
+            <td>Number of Features</td>
+            <td id="summary-features">—</td>
+          </tr>
+          <tr>
+            <td>Number of Classes</td>
+            <td id="summary-classes">—</td>
+          </tr>
+          <tr>
+            <td>Test Accuracy</td>
+            <td id="summary-accuracy">—</td>
+          </tr>
+          <tr>
+            <td>Macro F1 Score</td>
+            <td id="summary-f1">—</td>
+          </tr>
+          <tr>
+            <td>Target Variable</td>
+            <td>prediction_20d</td>
+          </tr>
+          <tr>
+            <td>Classes</td>
+            <td id="summary-class-names">—</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      Generated with Scikit-learn HistGradientBoostingClassifier | Model saved to <code>classification/model.pkl</code>
+    </div>
+  </main>
+
+  <script>
+    // Load results.json and populate KPIs
+    async function loadResults() {
+      try {
+        const response = await fetch('/classification/results.json');
+        const results = await response.json();
+
+        // Update KPIs (removed macro F1)
+        document.getElementById('kpi-accuracy').textContent = (results.test_accuracy * 100).toFixed(2) + '%';
+        document.getElementById('kpi-train').textContent = results.train_size.toLocaleString();
+        document.getElementById('kpi-test').textContent = results.test_size.toLocaleString();
+        document.getElementById('kpi-features').textContent = results.num_features;
+        document.getElementById('kpi-classes').textContent = results.num_classes;
+
+        // Update summary table
+        document.getElementById('summary-train').textContent = results.train_size.toLocaleString();
+        document.getElementById('summary-test').textContent = results.test_size.toLocaleString();
+        document.getElementById('summary-features').textContent = results.num_features;
+        document.getElementById('summary-classes').textContent = results.num_classes;
+        document.getElementById('summary-accuracy').textContent = (results.test_accuracy * 100).toFixed(4) + '%';
+        document.getElementById('summary-f1').textContent = (results.test_f1_macro * 100).toFixed(4) + '%';
+        document.getElementById('summary-class-names').textContent = results.classes.join(', ');
+
+      } catch (e) {
+        console.error('Error loading results:', e);
+      }
+    }
+
+    // Load classification report
+    async function loadClassificationReport() {
+      try {
+        const response = await fetch('/classification/classification_report.json');
+        const report = await response.json();
+
+        let html = '<div class="table-container"><table><tr><th>Class</th><th>Precision</th><th>Recall</th><th>F1-Score</th><th>Support</th></tr>';
+        
+        for (const [key, values] of Object.entries(report)) {
+          if (key !== 'accuracy' && key !== 'macro avg' && key !== 'weighted avg') {
+            html += `<tr>
+              <td>${key}</td>
+              <td>${(values.precision * 100).toFixed(2)}%</td>
+              <td>${(values.recall * 100).toFixed(2)}%</td>
+              <td>${(values['f1-score'] * 100).toFixed(2)}%</td>
+              <td>${values.support}</td>
+            </tr>`;
+          }
+        }
+
+        if (report['macro avg']) {
+          html += `<tr style="font-weight: bold; background: rgba(148, 163, 184, 0.1);">
+            <td>Macro Average</td>
+            <td>${(report['macro avg'].precision * 100).toFixed(2)}%</td>
+            <td>${(report['macro avg'].recall * 100).toFixed(2)}%</td>
+            <td>${(report['macro avg']['f1-score'] * 100).toFixed(2)}%</td>
+            <td>${report['macro avg'].support}</td>
+          </tr>`;
+        }
+
+        html += '</table></div>';
+        document.getElementById('classification-report').innerHTML = html;
+
+      } catch (e) {
+        console.error('Error loading classification report:', e);
+        document.getElementById('classification-report').innerHTML = '<div class="muted">Classification report not available. Run model first.</div>';
+      }
+    }
+
+    // Load on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      loadResults();
+      loadClassificationReport();
+    });
+  </script>
+</body>
+</html>

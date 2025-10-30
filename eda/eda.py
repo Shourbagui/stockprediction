@@ -19,7 +19,7 @@ os.environ.setdefault("MPLCONFIGDIR", str(OUTPUT_DIR / ".mplconfig"))
 mpl.use("Agg", force=True)
 
 
-DATA_PATH = Path("/Users/alyshourbagui/bigdata/panel_daily.csv")
+DATA_PATH = Path("/Users/alyshourbagui/bigdata/panel_daily_with_msq.csv")
 
 
 def ensure_output_dir() -> None:
@@ -126,7 +126,7 @@ def dataset_overview(df: pd.DataFrame) -> None:
 
 def class_imbalance(df: pd.DataFrame) -> None:
     # The provided labels appear historical; still profile them
-    label_cols = [c for c in df.columns if c in ("label_5d", "label_20d")]
+    label_cols = [c for c in df.columns if c in ("label_5d", "prediction_20d")]
     for col in label_cols:
         counts = df[col].value_counts(dropna=False)
         counts.to_csv(OUTPUT_DIR / f"class_counts_{col}.csv")
@@ -200,17 +200,7 @@ def correlation_analysis(df: pd.DataFrame) -> None:
     plt.savefig(OUTPUT_DIR / "correlation_heatmap.png", dpi=150)
     plt.close()
 
-    # Crosstab correlation between label_5d and label_20d (co-occurrence heatmap)
-    if set(["label_5d", "label_20d"]).issubset(df.columns):
-        ct = pd.crosstab(df["label_5d"].astype(str), df["label_20d"].astype(str))
-        plt.figure(figsize=(6, 5))
-        sns.heatmap(ct, annot=True, fmt='d', cmap="Blues")
-        plt.title("Co-occurrence: label_5d vs label_20d")
-        plt.ylabel("label_5d")
-        plt.xlabel("label_20d")
-        plt.tight_layout()
-        plt.savefig(OUTPUT_DIR / "label5_vs_label20_heatmap.png", dpi=150)
-        plt.close()
+    # Note: label_20d was removed from the dataset, only label_5d remains
 
 
 def ticker_recent_slice(df: pd.DataFrame, recent_years: int = 10) -> pd.DataFrame:
@@ -308,36 +298,36 @@ def label_transition_matrix(df: pd.DataFrame) -> None:
 
 
 def mutual_information_topk(df: pd.DataFrame, top_k: int = 30) -> None:
-    label_col = "label_5d" if "label_5d" in df.columns else None
-    if not label_col:
-        return
-    y = df[label_col].astype("category").cat.codes
-    num = df.select_dtypes(include=[np.number]).copy()
-    # Drop targets and forward returns
-    drop_cols = [c for c in num.columns if c.startswith("fwd_ret_")]
-    num = num.drop(columns=drop_cols, errors="ignore")
-    # Clean NaN/inf and constants
-    num = num.replace([np.inf, -np.inf], np.nan)
-    num = num.fillna(num.median(numeric_only=True))
-    num = num.fillna(0)
-    # Drop constant columns (no information)
-    nunq = num.nunique(dropna=False)
-    num = num.loc[:, nunq > 1]
-    if num.shape[1] == 0:
-        return
-    mi = mutual_info_classif(num.values, y.values, discrete_features=False, random_state=42)
-    mi_series = pd.Series(mi, index=num.columns).sort_values(ascending=False)
-    mi_series.to_csv(OUTPUT_DIR / "mutual_information_label5.csv")
+    for label_col in ["label_5d", "prediction_20d"]:
+        if label_col not in df.columns:
+            continue
+        y = df[label_col].astype("category").cat.codes
+        num = df.select_dtypes(include=[np.number]).copy()
+        # Drop targets and forward returns
+        drop_cols = [c for c in num.columns if c.startswith("fwd_ret_")]
+        num = num.drop(columns=drop_cols, errors="ignore")
+        # Clean NaN/inf and constants
+        num = num.replace([np.inf, -np.inf], np.nan)
+        num = num.fillna(num.median(numeric_only=True))
+        num = num.fillna(0)
+        # Drop constant columns (no information)
+        nunq = num.nunique(dropna=False)
+        num = num.loc[:, nunq > 1]
+        if num.shape[1] == 0:
+            continue
+        mi = mutual_info_classif(num.values, y.values, discrete_features=False, random_state=42)
+        mi_series = pd.Series(mi, index=num.columns).sort_values(ascending=False)
+        mi_series.to_csv(OUTPUT_DIR / f"mutual_information_{label_col}.csv")
 
-    top = mi_series.head(top_k)
-    plt.figure(figsize=(8, max(4, int(0.35*len(top)))))
-    sns.barplot(x=top.values, y=top.index, orient="h")
-    plt.title("Top features by mutual information with label_5d")
-    plt.xlabel("mutual information")
-    plt.ylabel("feature")
-    plt.tight_layout()
-    plt.savefig(OUTPUT_DIR / "mi_topk_label5.png", dpi=150)
-    plt.close()
+        top = mi_series.head(top_k)
+        plt.figure(figsize=(8, max(4, int(0.35*len(top)))))
+        sns.barplot(x=top.values, y=top.index, orient="h")
+        plt.title(f"Top features by mutual information with {label_col}")
+        plt.xlabel("mutual information")
+        plt.ylabel("feature")
+        plt.tight_layout()
+        plt.savefig(OUTPUT_DIR / f"mi_topk_{label_col}.png", dpi=150)
+        plt.close()
 
 
 def pca_and_vif(df: pd.DataFrame, max_vif_features: int = 30) -> None:
@@ -476,6 +466,131 @@ def price_lines_recent(df: pd.DataFrame) -> None:
     plt.close(fig)
 
 
+def msq_fundamental_analysis(df: pd.DataFrame) -> None:
+    """Analyze MSQ fundamental metrics: distributions and correlations."""
+    msq_cols = [col for col in df.columns if col.startswith('msq_')]
+    if not msq_cols:
+        return
+    
+    # 1. Correlation heatmap for MSQ metrics
+    msq_data = df[msq_cols].select_dtypes(include=[np.number]).dropna(how='all', axis=1)
+    if len(msq_data.columns) > 1:
+        corr = msq_data.corr()
+        fig, ax = plt.subplots(figsize=(14, 12))
+        sns.heatmap(corr, cmap='coolwarm', center=0, vmin=-1, vmax=1, 
+                   cbar_kws={'label': 'Correlation'}, ax=ax, square=True)
+        ax.set_title("MSQ fundamental metrics — correlation matrix")
+        ax.set_xticklabels([col.replace('msq_', '') for col in msq_data.columns], 
+                           rotation=45, ha='right', fontsize=7)
+        ax.set_yticklabels([col.replace('msq_', '') for col in msq_data.columns], 
+                           rotation=0, fontsize=7)
+        fig.tight_layout()
+        fig.savefig(OUTPUT_DIR / "msq_correlation_heatmap.png", dpi=150)
+        plt.close(fig)
+    
+    # 2. Boxplots of key MSQ ratios by label
+    if 'label_5d' in df.columns:
+        key_ratios = ['msq_peTTM', 'msq_pb', 'msq_psTTM', 'msq_roeTTM', 'msq_currentRatio', 'msq_grossMargin', 'msq_netMargin', 'msq_totalDebtToEquity']
+        available_ratios = [r for r in key_ratios if r in df.columns]
+        
+        if available_ratios:
+            n_cols = min(len(available_ratios), 4)  # 4 columns max
+            fig, axes = plt.subplots(2, 2, figsize=(14, 12))
+            axes = axes.ravel()
+            
+            for idx, col in enumerate(available_ratios[:4]):
+                data_by_label = [df[df['label_5d'] == label][col].dropna() for label in ['Buy', 'Hold', 'Sell']]
+                axes[idx].boxplot(data_by_label, labels=['Buy', 'Hold', 'Sell'])
+                axes[idx].set_title(col.replace('msq_', ''), fontsize=10)
+                axes[idx].set_ylabel("Value")
+                axes[idx].grid(axis='y', alpha=0.3)
+            
+            # Hide unused subplots
+            for idx in range(len(available_ratios[:4]), len(axes)):
+                axes[idx].set_visible(False)
+            
+            fig.suptitle("MSQ key ratios by trading signal", fontsize=12, y=0.995)
+            fig.tight_layout()
+            fig.savefig(OUTPUT_DIR / "msq_boxplots_by_label.png", dpi=150)
+            plt.close(fig)
+        
+        # Additional: ROE and ROA by label
+        roe_cols = ['msq_roaTTM', 'msq_roeTTM', 'msq_roicTTM']
+        available_roe = [r for r in roe_cols if r in df.columns]
+        if available_roe:
+            fig, axes = plt.subplots(1, len(available_roe), figsize=(5*len(available_roe), 6))
+            if len(available_roe) == 1:
+                axes = [axes]
+            
+            for ax, col in zip(axes, available_roe):
+                data_by_label = [df[df['label_5d'] == label][col].dropna() for label in ['Buy', 'Hold', 'Sell']]
+                ax.boxplot(data_by_label, labels=['Buy', 'Hold', 'Sell'])
+                ax.set_title(col.replace('msq_', ''), fontsize=11)
+                ax.set_ylabel("Value (%)")
+                ax.grid(axis='y', alpha=0.3)
+            
+            fig.suptitle("MSQ return metrics by trading signal", fontsize=12, y=1.02)
+            fig.tight_layout()
+            fig.savefig(OUTPUT_DIR / "msq_returns_by_label.png", dpi=150)
+            plt.close(fig)
+    
+    # 3. Time series of average MSQ metrics
+    if 'date' in df.columns:
+        key_metrics = ['msq_peTTM', 'msq_roeTTM', 'msq_currentRatio', 'msq_payoutRatioTTM']
+        available_metrics = [m for m in key_metrics if m in df.columns]
+        
+        if available_metrics:
+            df_with_date = df[['date'] + available_metrics].copy()
+            df_with_date['date'] = pd.to_datetime(df_with_date['date'])
+            monthly = df_with_date.set_index('date').resample('M').mean()
+            
+            fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+            axes = axes.ravel()
+            
+            for ax, col in zip(axes, available_metrics[:4]):
+                if col in monthly.columns:
+                    ax.plot(monthly.index, monthly[col], linewidth=1.5, alpha=0.8)
+                    ax.set_title(col.replace('msq_', ''), fontsize=10)
+                    ax.set_xlabel("Date")
+                    ax.set_ylabel("Value")
+                    ax.grid(alpha=0.3)
+                    ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha='right')
+            
+            fig.suptitle("MSQ fundamental metrics — monthly averages over time", fontsize=12)
+            fig.tight_layout()
+            fig.savefig(OUTPUT_DIR / "msq_timeseries_monthly.png", dpi=150)
+            plt.close(fig)
+    
+    # 4. Scatter plot matrix for key valuation metrics
+    valuation_cols = ['msq_peTTM', 'msq_pb', 'msq_psTTM', 'msq_roeTTM']
+    available_valuation = [c for c in valuation_cols if c in df.columns]
+    
+    if len(available_valuation) >= 2:
+        fig, axes = plt.subplots(2, 2, figsize=(14, 12))
+        axes = axes.ravel()
+        
+        pairs = [
+            ('msq_peTTM', 'msq_pb'),
+            ('msq_psTTM', 'msq_roeTTM'),
+            ('msq_peTTM', 'msq_psTTM'),
+            ('msq_pb', 'msq_roeTTM')
+        ]
+        
+        for idx, (x_col, y_col) in enumerate(pairs[:4]):
+            if x_col in available_valuation and y_col in available_valuation:
+                ax = axes[idx]
+                scatter = ax.scatter(df[x_col].dropna(), df[y_col].dropna(), alpha=0.3, s=10)
+                ax.set_xlabel(x_col.replace('msq_', ''), fontsize=9)
+                ax.set_ylabel(y_col.replace('msq_', ''), fontsize=9)
+                ax.grid(alpha=0.2)
+                ax.set_title(f"{x_col.replace('msq_', '')} vs {y_col.replace('msq_', '')}", fontsize=9)
+        
+        fig.suptitle("MSQ fundamental metrics — scatter relationships", fontsize=12, y=0.995)
+        fig.tight_layout()
+        fig.savefig(OUTPUT_DIR / "msq_scatter_matrix.png", dpi=150)
+        plt.close(fig)
+
+
 def profile_with_ydata(df: pd.DataFrame) -> None:
     try:
         from ydata_profiling import ProfileReport
@@ -511,6 +626,7 @@ def main() -> None:
     pca_and_vif(df_recent)
     acf_pacf_and_rolling_vol(df_recent)
     leakage_audit(df_recent)
+    msq_fundamental_analysis(df_recent)
     profile_with_ydata(df_recent)
 
     # Save a typed schema snapshot

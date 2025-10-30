@@ -79,16 +79,20 @@
           <img src="class_distribution_label_5d.png" alt="Class distribution label_5d">
         </div>
         <div class="card two">
-          <h3>Class distribution — label_20d</h3>
-          <img src="class_distribution_label_20d.png" alt="Class distribution label_20d">
+          <h3>Class distribution — prediction_20d</h3>
+          <img src="class_distribution_prediction_20d.png" alt="Class distribution prediction_20d">
         </div>
         <div class="card two">
           <h3>Class distribution (pie) — label_5d</h3>
-          <img src="class_distribution_label_5d_pie.png" alt="Class distribution label_5d pie">
+          <div style="display: flex; justify-content: center;">
+            <img src="class_distribution_label_5d_pie.png" alt="Class distribution label_5d pie">
+          </div>
         </div>
         <div class="card two">
-          <h3>Class distribution (pie) — label_20d</h3>
-          <img src="class_distribution_label_20d_pie.png" alt="Class distribution label_20d pie">
+          <h3>Class distribution (pie) — prediction_20d</h3>
+          <div style="display: flex; justify-content: center;">
+            <img src="class_distribution_prediction_20d_pie.png" alt="Class distribution prediction_20d pie">
+          </div>
         </div>
 
         <div class="card two">
@@ -101,16 +105,6 @@
           <img src="label5_by_ticker_stacked.png" alt="Label by ticker stacked">
           <p class="muted" style="margin-top:10px">Stacked bars show proportions of Buy/Hold/Sell per ticker.</p>
         </div>
-        <div class="card two">
-          <h3>Correlation heatmap</h3>
-          <img src="correlation_heatmap.png" alt="Correlation heatmap">
-          <p class="muted" style="margin-top:10px">Strong coherence among moving averages; returns correlate with momentum/RSI features.</p>
-        </div>
-        <div class="card two">
-          <h3>Label 5d vs 20d</h3>
-          <img src="label5_vs_label20_heatmap.png" alt="Label 5d vs 20d heatmap">
-          <p class="muted" style="margin-top:10px">Co-occurrence heatmap: how often each pair of labels happens together.</p>
-        </div>
 
         <div class="card full">
           <h3>Key distributions — Boxplots</h3>
@@ -121,6 +115,35 @@
           <img src="histograms_1.png" alt="Histograms batch 1" onerror="this.style.display='none'">
         </div>
 
+        <div class="card full">
+          <h3>MSQ fundamental metrics — correlation matrix</h3>
+          <img src="msq_correlation_heatmap.png" alt="MSQ correlation heatmap">
+          <p class="muted" style="margin-top:10px">Correlations among MSQ fundamental metrics. Helps identify redundant features and relationships between financial ratios.</p>
+        </div>
+
+        <div class="card full">
+          <h3>MSQ key ratios by trading signal</h3>
+          <img src="msq_boxplots_by_label.png" alt="MSQ boxplots by label">
+          <p class="muted" style="margin-top:10px">Distribution of key fundamental ratios (P/E, P/B, ROE, etc.) by Buy/Hold/Sell signals.</p>
+        </div>
+
+        <div class="card full">
+          <h3>MSQ return metrics by trading signal</h3>
+          <img src="msq_returns_by_label.png" alt="MSQ returns by label">
+          <p class="muted" style="margin-top:10px">Distribution of return metrics (ROA, ROE, ROIC) by Buy/Hold/Sell signals.</p>
+        </div>
+
+        <div class="card full">
+          <h3>MSQ metrics — time series trends</h3>
+          <img src="msq_timeseries_monthly.png" alt="MSQ timeseries">
+          <p class="muted" style="margin-top:10px">Monthly averages of key fundamental metrics over time. Shows how fundamentals evolve across market cycles.</p>
+        </div>
+
+        <div class="card full">
+          <h3>MSQ fundamental metrics — scatter relationships</h3>
+          <img src="msq_scatter_matrix.png" alt="MSQ scatter matrix">
+          <p class="muted" style="margin-top:10px">Scatter plots showing relationships between key valuation metrics (P/E, P/B, P/S, ROE).</p>
+        </div>
 
         <div class="card full">
           <h3>Rolling class distribution (monthly)</h3>
@@ -129,14 +152,14 @@
         </div>
 
         <div class="card two">
-          <h3>Label transition matrix</h3>
-          <img src="label5_transition_matrix.png" alt="Label transition matrix">
-          <p class="muted" style="margin-top:10px">Consecutive-day transitions for label_5d. High diagonal = persistence; off-diagonal = flips.</p>
-        </div>
-        <div class="card two">
-          <h3>Mutual information (top features)</h3>
+          <h3>Mutual information (top features) — label_5d</h3>
           <img src="mi_topk_label5.png" alt="Mutual information top-k">
           <p class="muted" style="margin-top:10px">Nonlinear, model-agnostic importance of features vs. label_5d. See CSV for full ranking.</p>
+        </div>
+        <div class="card two">
+          <h3>Mutual information (top features) — prediction_20d</h3>
+          <img src="mi_topk_prediction_20d.png" alt="Mutual information top-k">
+          <p class="muted" style="margin-top:10px">Nonlinear, model-agnostic importance of features vs. prediction_20d. See CSV for full ranking.</p>
         </div>
 
         <div class="card full">
@@ -179,9 +202,9 @@
         </div>
 
         <div class="card two">
-          <h3>Per‑ticker coverage</h3>
-          <iframe src="ticker_coverage.csv" style="width:100%;height:240px;background:#0a0f1a;border:1px solid rgba(148,163,184,.15);border-radius:10px"></iframe>
-          <p class="muted" style="margin-top:10px">All 6 tickers have consistent coverage across the chosen period.</p>
+          <h3>Correlation heatmap</h3>
+          <img src="correlation_heatmap.png" alt="Correlation heatmap">
+          <p class="muted" style="margin-top:10px">Strong coherence among moving averages; returns correlate with momentum/RSI features.</p>
         </div>
         <div class="card two" style="display:flex;align-items:center;justify-content:space-between;gap:12px">
           <div>
@@ -191,10 +214,21 @@
           </div>
           <img src="histograms_2.png" alt="Histograms batch 2" style="max-width:48%" onerror="this.style.display='none'">
         </div>
+
+        <div class="card two" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+          <div style="width:100%">
+            <h3 style="margin-bottom:6px">Classification report — prediction_20d</h3>
+            <p class="muted" style="margin:0 0 10px">Click to fetch the latest model classification report and render it here.</p>
+            <button id="btn-load-cls" style="background:#1d4ed8;color:#e2e8f0;border:1px solid rgba(59,130,246,.7);border-radius:8px;padding:8px 12px;cursor:pointer">Get classification report</button>
+            <div id="cls-report" style="margin-top:12px;overflow:auto"></div>
+          </div>
+        </div>
       </section>
 
       <section class="footer">
         Generated locally • Links to CSVs and PNGs in this folder.
+        <br><br>
+        <a href="../classification/index.html" style="color: #60a5fa; text-decoration: none; border-bottom: 1px solid #60a5fa; padding-bottom: 2px;">🤖 View Classification Model Results →</a>
       </section>
     </main>
 
@@ -227,6 +261,38 @@
           document.querySelector('.wrap').prepend(hint);
         }
       })();
+
+      async function loadClassificationReportIntoDashboard(){
+        const mount = document.getElementById('cls-report');
+        if(!mount) return;
+        mount.innerHTML = '<div class="muted">Loading classification report...</div>';
+        try {
+          const res = await fetch('/classification/classification_report.json');
+          if(!res.ok) throw new Error('Not found');
+          const report = await res.json();
+
+          let html = '<div class="table-container"><table><thead><tr><th>Class</th><th>Precision</th><th>Recall</th><th>F1-Score</th><th>Support</th></tr></thead><tbody>';
+          for (const [label, vals] of Object.entries(report)){
+            if (['accuracy','macro avg','weighted avg'].includes(label)) continue;
+            html += `<tr><td>${label}</td><td>${(vals.precision*100).toFixed(2)}%</td><td>${(vals.recall*100).toFixed(2)}%</td><td>${(vals['f1-score']*100).toFixed(2)}%</td><td>${vals.support}</td></tr>`;
+          }
+          if (report['macro avg']){
+            const v = report['macro avg'];
+            html += `<tr style="font-weight:600;background:rgba(148,163,184,.08)"><td>Macro avg</td><td>${(v.precision*100).toFixed(2)}%</td><td>${(v.recall*100).toFixed(2)}%</td><td>${(v['f1-score']*100).toFixed(2)}%</td><td>${v.support}</td></tr>`;
+          }
+          html += '</tbody></table></div>';
+          mount.innerHTML = html;
+        } catch (e){
+          mount.innerHTML = '<div class="muted">Classification report not found. Run the model first (see classification/).</div>';
+        }
+      }
+
+      const btn = document.getElementById('btn-load-cls');
+      if (btn) {
+        btn.addEventListener('click', () => {
+          window.open('/reports/classification/index.html', '_blank');
+        });
+      }
     </script>
   </body>
   </html>

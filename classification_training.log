@@ -1,0 +1,69 @@
+/Users/alyshourbagui/.matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /var/folders/rf/ygsy2r9d08v0p1vk0ngm_w4r0000gn/T/matplotlib-8pg_sz9b because there was an issue with the default path (/Users/alyshourbagui/.matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+Matplotlib is building the font cache; this may take a moment.
+======================================================================
+LOADING DATA
+======================================================================
+Data shape: (56295, 70)
+Date range: 1970-06-30 to 2025-10-24
+Unique tickers: 6
+
+Target variable: prediction_20d
+Class distribution:
+prediction_20d
+Hold    34600
+Buy     13684
+Sell     7891
+Name: count, dtype: int64
+
+Class distribution (%):
+prediction_20d
+Hold    61.593235
+Buy     24.359591
+Sell    14.047174
+Name: proportion, dtype: float64
+
+Data shape after dropping NaN targets: (56175, 70)
+
+======================================================================
+FEATURE ENGINEERING
+======================================================================
+
+1. Creating temporal features...
+2. Creating lagged features...
+3. Creating rolling statistics...
+4. Creating momentum features...
+5. Creating volume features...
+6. Encoding ticker...
+7. Creating volatility regime...
+
+Total features after engineering: 115
+
+======================================================================
+PREPARING FEATURES
+======================================================================
+Number of features: 109
+
+Handling missing values...
+Traceback (most recent call last):
+  File "/Users/alyshourbagui/bigdata/classification/train_model.py", line 144, in <module>
+    X = X.fillna(X.median())
+  File "/Users/alyshourbagui/bigdata/.venv_lgb/lib/python3.9/site-packages/pandas/core/frame.py", line 11733, in median
+    result = super().median(axis, skipna, numeric_only, **kwargs)
+  File "/Users/alyshourbagui/bigdata/.venv_lgb/lib/python3.9/site-packages/pandas/core/generic.py", line 12496, in median
+    return self._stat_function(
+  File "/Users/alyshourbagui/bigdata/.venv_lgb/lib/python3.9/site-packages/pandas/core/generic.py", line 12442, in _stat_function
+    return self._reduce(
+  File "/Users/alyshourbagui/bigdata/.venv_lgb/lib/python3.9/site-packages/pandas/core/frame.py", line 11589, in _reduce
+    res = df._mgr.reduce(blk_func)
+  File "/Users/alyshourbagui/bigdata/.venv_lgb/lib/python3.9/site-packages/pandas/core/internals/managers.py", line 1519, in reduce
+    nbs = blk.reduce(func)
+  File "/Users/alyshourbagui/bigdata/.venv_lgb/lib/python3.9/site-packages/pandas/core/internals/blocks.py", line 406, in reduce
+    result = func(self.values)
+  File "/Users/alyshourbagui/bigdata/.venv_lgb/lib/python3.9/site-packages/pandas/core/frame.py", line 11497, in blk_func
+    return values._reduce(name, skipna=skipna, keepdims=True, **kwds)
+  File "/Users/alyshourbagui/bigdata/.venv_lgb/lib/python3.9/site-packages/pandas/core/arrays/categorical.py", line 2391, in _reduce
+    result = super()._reduce(name, skipna=skipna, keepdims=keepdims, **kwargs)
+  File "/Users/alyshourbagui/bigdata/.venv_lgb/lib/python3.9/site-packages/pandas/core/arrays/base.py", line 1954, in _reduce
+    raise TypeError(
+TypeError: 'Categorical' with dtype category does not support reduction 'median'
